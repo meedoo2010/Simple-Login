@@ -6,4 +6,4 @@ icon = "assets/icon.png"
 
 [tool.flet]
 app_name = "Simple-Login"
-app_id = "com.bank.mywallet"
+app_id = "com.simple.login"
