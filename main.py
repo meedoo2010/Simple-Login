@@ -1,19 +1,33 @@
 from flet import *
 import requests
-import mkmsg
 import os
 from dotenv import load_dotenv
 import time
 import threading
+import smtplib
+from email.mime.text import MIMEText
+from email.utils import formataddr
 import random
 
 load_dotenv()
 
+def generate_otp(length=6):
+    return random.randint(10**(length-1), 10**length - 1)
+
+def send_html_mail(email_sender: str, app_password: str, your_name: str, subject: str, html_code: str, email_receiver: str):
+    msg = MIMEText(html_code, "html", "utf-8")
+    msg['Subject'] = subject
+    msg['From'] = formataddr((your_name, email_sender))
+    msg['To'] = email_receiver
+    
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as sender_email:
+        sender_email.login(email_sender, app_password)
+        sender_email.sendmail(email_sender, email_receiver, msg.as_string())
 
 
 
 global otp_code
-otp_code = mkmsg.generate_otp(6)
+otp_code = generate_otp(6)
 html_code = f"""
 <!DOCTYPE html>
 <html>
@@ -93,6 +107,11 @@ DB_URL = "https://bank-my-wallet-default-rtdb.asia-southeast1.firebasedatabase.a
 
 
 def main(page:Page):
+    page.title = ("Simple Login")
+    page.window.width= 390
+    page.window.height =740
+    page.window.top=45
+    page.window.left=570
     page.theme_mode = ThemeMode.LIGHT
     page.scroll = 'auto'
     ###### appbar start ######
@@ -164,7 +183,7 @@ def main(page:Page):
         
         # إرسال OTP على الإيميل
         email_receiver = signup_email.value
-        mkmsg.send_html_mail(os.getenv("EMAIL"), os.getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", html_code, email_receiver)
+        send_html_mail(os.getenv("EMAIL"), os.getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", html_code, email_receiver)
         message("OTP has been sent to your email")
 
         # تفعيل انتهاء صلاحية OTP
