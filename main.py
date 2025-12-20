@@ -109,13 +109,6 @@ def main(page:Page):
         title= Text("Simple Login"),
         center_title=True,
         leading_width=40,
-        actions=[
-                    PopupMenuButton(
-                        items=[
-                            PopupMenuItem(text="Get Account ID", on_click=lambda _: page.go("/account_id")),
-                        ]
-                    )
-                ]
         )
     ######appbar end #######
     
@@ -383,26 +376,10 @@ def main(page:Page):
     )
     
     ########### Account ID page ########
-    def route_change(route):
-        if page.route == "/account_id":
-            appbar = AppBar(title=Text("Get Account ID"),
-                center_title=True,
-                bgcolor=Colors.BLACK,
-                color=Colors.WHITE,
-                )
-            tf1 = TextField(label="E-mail", color=Colors.BLACK)
-            tf2 = TextField(label="Password", color=Colors.BLACK)
-            enter = ElevatedButton("Login")
-            page.views.append(
-                            View(
-                                "/account_id",
-                                [
-                                    appbar,
-                                    Row([enter],alignment=MainAxisAlignment.CENTER, spacing=20)
-                                ]
-                            )
-                        )
-            page.update()
+    
+    
+    
+
     
 
     #####################################
