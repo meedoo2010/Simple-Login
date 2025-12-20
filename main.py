@@ -93,15 +93,8 @@ DB_URL = "https://bank-my-wallet-default-rtdb.asia-southeast1.firebasedatabase.a
 
 
 def main(page:Page):
-    page.title = ("Simple Login")
-    page.window.width= 390
-    page.window.height =740
-    page.window.top=45
-    page.window.left=570
     page.theme_mode = ThemeMode.LIGHT
     page.scroll = 'auto'
-    #page.vertical_alignment="center" #top - bottom
-    page.horizontal_alignment="center" # right - left
     ###### appbar start ######
     page.appbar = AppBar(
         bgcolor=Colors.BLACK,
@@ -358,7 +351,7 @@ def main(page:Page):
     signup_confirm = TextField(label="Confirm password", password=True, can_reveal_password=True, color=Colors.BLACK)
     signup_OTP = TextField(label="Enter OTP",width=175,max_length=6,keyboard_type=KeyboardType.NUMBER, color=Colors.BLACK)
     send_OTP_btn = ElevatedButton("Send OTP",width=175,on_click=send_otp_click)
-    btn1 = ElevatedButton('Create account', width=225, height=45, on_click=add1)
+    btn1 = Row([ElevatedButton('Create account', width=225, height=45, on_click=add1)],alignment=MainAxisAlignment.CENTER)
     edit_btn = IconButton(
         icon=Icons.EDIT,
         tooltip="Edit",
