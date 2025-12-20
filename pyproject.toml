@@ -1,0 +1,9 @@
+[project]
+name = "Simple Login"
+version = "1.0.0"
+description = "Digital Login App"
+icon = "assets/icon.png"
+
+[tool.flet]
+app_name = "Simple-Login"
+app_id = "com.bank.mywallet"
