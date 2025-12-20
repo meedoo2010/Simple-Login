@@ -1,4 +1,4 @@
 flet
 requests
 python-dotenv
-mkmsg
+mkmsg == 0.0.7
