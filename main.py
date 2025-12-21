@@ -4,31 +4,111 @@ import os
 from dotenv import load_dotenv
 import time
 import threading
-import smtplib
-from email.mime.text import MIMEText
-from email.utils import formataddr
+from mkmsg import send_html_mail, generate_otp
 import random
 
 load_dotenv()
 
-def generate_otp(length=6):
-    return random.randint(10**(length-1), 10**length - 1)
 
-def send_html_mail(email_sender: str, app_password: str, your_name: str, subject: str, html_code: str, email_receiver: str):
-    msg = MIMEText(html_code, "html", "utf-8")
-    msg['Subject'] = subject
-    msg['From'] = formataddr((your_name, email_sender))
-    msg['To'] = email_receiver
-    
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as sender_email:
-        sender_email.login(email_sender, app_password)
-        sender_email.sendmail(email_sender, email_receiver, msg.as_string())
+
+
+def build_account_email(name, email, account_id):
+    return f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Account Information</title>
+</head>
+<body style="
+    margin:0;
+    padding:0;
+    background-color:#f4f6f8;
+    font-family:Arial, sans-serif;
+">
+
+<table width="100%"  cellpadding="0" cellspacing="0">
+    <tr>
+        <td align="center" valign="middle">
+
+            <table width="360" cellpadding="0" cellspacing="0"
+                style="
+                    background:#ffffff;
+                    border-radius:16px;
+                    padding:32px;
+                    box-shadow:0 15px 40px rgba(0,0,0,0.12);
+                    text-align:left;
+                ">
+
+                <!-- Header -->
+                <tr>
+                    <td style="text-align:center;">
+                        <h2 style="
+                            margin:0;
+                            color:#111;
+                        ">
+                            Your Account Data
+                        </h2>
+                        <p style="
+                            margin-top:6px;
+                            color:#666;
+                            font-size:14px;
+                        ">
+                            Simple Login Application
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Divider -->
+                <tr>
+                    <td>
+                        <hr style="
+                            border:none;
+                            height:1px;
+                            background:#eee;
+                            margin:24px 0;
+                        ">
+                    </td>
+                </tr>
+
+                <!-- Data -->
+                <tr>
+                    <td>
+                        <p><strong>  Name:</strong> {name}</p>
+                        <p><strong>  Email:</strong> {email}</p>
+                        <p><strong>  Account ID:</strong> {account_id}</p>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td style="padding-top:24px; text-align:center;">
+                        <p style="
+                            color:#888;
+                            font-size:13px;
+                            margin:0;
+                        ">
+                            ⚠️ Don’t share your account data with anyone
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
+"""
+
 
 
 
 global otp_code
 otp_code = generate_otp(6)
-html_code = f"""
+html_code_otp = f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -102,6 +182,8 @@ def app_id():
     mkapp = "65277"
     num_account = ''.join(random.choices('0123456789', k=7))
     return (f"{mkapp}-{num_account}")
+account_id = app_id()
+
 
 DB_URL = "https://bank-my-wallet-default-rtdb.asia-southeast1.firebasedatabase.app/login.json"
 
@@ -155,7 +237,6 @@ def main(page:Page):
         page.update()
         return
     
-       
     ######## Tools start ########
     
     def send_otp_click(e):
@@ -183,7 +264,7 @@ def main(page:Page):
         
         # إرسال OTP على الإيميل
         email_receiver = signup_email.value
-        send_html_mail(os.getenv("EMAIL"), os.getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", html_code, email_receiver)
+        send_html_mail(os.getenv("EMAIL"), os.getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", html_code_otp, email_receiver)
         message("OTP has been sent to your email")
 
         # تفعيل انتهاء صلاحية OTP
@@ -334,7 +415,7 @@ def main(page:Page):
             r = requests.post(DB_URL, json=payload)
             if r.status_code != 200:
                 raise Exception(f"Failed to save user. Status code: {r.status_code}")
-            
+            send_html_mail(os.getenv("EMAIL"), os.getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", build_account_email(signup_name.value.capitalize(), signup_email.value, app_id()), signup_email.value)
             signup_name.value = ""
             signup_email.value = ""
             signup_phone.value = ""
@@ -357,9 +438,9 @@ def main(page:Page):
             alert.open = True
             page.update()
             return
-            
-            
-            
+    
+    global name
+    global signup_name        
     global signup_email
     global signup_OTP
     text = Text("Create account",color=Colors.BLACK,size=45)
@@ -376,6 +457,8 @@ def main(page:Page):
         tooltip="Edit",
         visible=False
     )
+    name = signup_name.value.capitalize()
+    
     
     ####### Tools end #######
     
