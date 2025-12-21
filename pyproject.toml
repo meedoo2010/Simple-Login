@@ -1,6 +1,6 @@
 [project]
 name = "Simple Login"
-version = "1.0.0"
+version = "1.0.1"
 description = "Digital Login App"
 icon = "assets/icon.png"
 
