@@ -203,11 +203,6 @@ DB_URL = "https://bank-my-wallet-default-rtdb.asia-southeast1.firebasedatabase.a
 
 
 def main(page:Page):
-    page.title = ("Simple Login")
-    page.window.width= 390
-    page.window.height =740
-    page.window.top=45
-    page.window.left=570
     page.theme_mode = ThemeMode.LIGHT
     page.scroll = 'auto'
     ###### appbar start ######
