@@ -1,18 +1,18 @@
-from flet import app, Page, TextField, ThemeMode, Colors, AppBar, AlertDialog, Text, TextButton, ImageFit, MainAxisAlignment, NavigationBarDestination, CupertinoNavigationBar, Row, IconButton, Icons, ElevatedButton, Image, KeyboardType
-from requests import get, post
-from os import getenv
+from flet import *
+import requests
+import os
 from dotenv import load_dotenv
-from time import sleep
-from threading import Thread
-from smtplib import SMTP_SSL
+import time
+import threading
+import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
-from random import randint, choices
+import random
 
 load_dotenv()
 
 def generate_otp(length=6):
-    return randint(10**(length-1), 10**length - 1)
+    return random.randint(10**(length-1), 10**length - 1)
 
 def send_html_mail(email_sender: str, app_password: str, your_name: str, subject: str, html_code: str, email_receiver: str):
     msg = MIMEText(html_code, "html", "utf-8")
@@ -20,7 +20,7 @@ def send_html_mail(email_sender: str, app_password: str, your_name: str, subject
     msg['From'] = formataddr((your_name, email_sender))
     msg['To'] = email_receiver
     
-    with SMTP_SSL('smtp.gmail.com', 465) as sender_email:
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as sender_email:
         sender_email.login(email_sender, app_password)
         sender_email.sendmail(email_sender, email_receiver, msg.as_string())
 
@@ -194,7 +194,7 @@ class Saver:
 
 def app_id():
     mkapp = "65277"
-    num_account = ''.join(choices('0123456789', k=7))
+    num_account = ''.join(random.choices('0123456789', k=7))
     return (f"{mkapp}-{num_account}")
 account_id = app_id()
 
@@ -203,6 +203,11 @@ DB_URL = "https://bank-my-wallet-default-rtdb.asia-southeast1.firebasedatabase.a
 
 
 def main(page:Page):
+    page.title = ("Simple Login")
+    page.window.width= 390
+    page.window.height =740
+    page.window.top=45
+    page.window.left=570
     page.theme_mode = ThemeMode.LIGHT
     page.scroll = 'auto'
     ###### appbar start ######
@@ -251,7 +256,7 @@ def main(page:Page):
     def send_otp_click(e):
         message_image(img)
         page.update()
-        sleep(1.5)
+        time.sleep(1.5)
         if signup_email.value.strip() == "":
             def close_dialog(ev):
                 alert.open = False
@@ -273,17 +278,17 @@ def main(page:Page):
         
         # إرسال OTP على الإيميل
         email_receiver = signup_email.value
-        send_html_mail(getenv("EMAIL"), getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", html_code_otp, email_receiver)
+        send_html_mail(os.getenv("EMAIL"), os.getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", html_code_otp, email_receiver)
         message("OTP has been sent to your email")
 
         # تفعيل انتهاء صلاحية OTP
         def otp_timer():
             global otp_code
-            sleep(60)  # مدة صلاحية OTP
+            time.sleep(60)  # مدة صلاحية OTP
             otp_code = None
 
 
-        Thread(target=otp_timer, daemon=True).start()
+        threading.Thread(target=otp_timer, daemon=True).start()
 
         # تفعيل عداد إعادة الإرسال
         def start_cooldown():
@@ -292,19 +297,19 @@ def main(page:Page):
             while remaining > 0:
                 send_OTP_btn.text = f"OTP validity period: {remaining}s"
                 page.update()
-                sleep(1)
+                time.sleep(1)
                 remaining -= 1
             send_OTP_btn.text = "Send OTP"
             send_OTP_btn.disabled = False
             page.update()
 
-        Thread(target=start_cooldown, daemon=True).start()
+        threading.Thread(target=start_cooldown, daemon=True).start()
 
     
     
     def email_exists(email):
         try:
-            r = get(DB_URL)
+            r = requests.get(DB_URL)
             if r.status_code != 200:
                 return False
 
@@ -323,7 +328,7 @@ def main(page:Page):
     def add1(e):
         message_image(img)
         page.update()
-        sleep(1.5)       
+        time.sleep(1.5)       
         fields = [
             signup_name.value,
             signup_email.value,
@@ -421,10 +426,10 @@ def main(page:Page):
         }
 
         try:
-            r = post(DB_URL, json=payload)
+            r = requests.post(DB_URL, json=payload)
             if r.status_code != 200:
                 raise Exception(f"Failed to save user. Status code: {r.status_code}")
-            send_html_mail(getenv("EMAIL"), getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", build_account_email(signup_name.value.capitalize(), signup_email.value, app_id()), signup_email.value)
+            send_html_mail(os.getenv("EMAIL"), os.getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", build_account_email(signup_name.value.capitalize(), signup_email.value, app_id()), signup_email.value)
             signup_name.value = ""
             signup_email.value = ""
             signup_phone.value = ""
