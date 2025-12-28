@@ -25,11 +25,25 @@ from os import getenv
 from dotenv import load_dotenv
 import time
 from threading import Thread
-from mkmsg import generate_otp, send_html_mail
+from smtplib import SMTP_SSL
+from email.mime.text import MIMEText
+from email.utils import formataddr
 from random import randint, choices
 
 load_dotenv()
 
+def generate_otp(length=6):
+    return randint(10**(length-1), 10**length - 1)
+
+def send_html_mail(email_sender: str, app_password: str, your_name: str, subject: str, html_code: str, email_receiver: str):
+    msg = MIMEText(html_code, "html", "utf-8")
+    msg['Subject'] = subject
+    msg['From'] = formataddr((your_name, email_sender))
+    msg['To'] = email_receiver
+    
+    with SMTP_SSL('smtp.gmail.com', 465) as sender_email:
+        sender_email.login(email_sender, app_password)
+        sender_email.sendmail(email_sender, email_receiver, msg.as_string())
 
 
 
