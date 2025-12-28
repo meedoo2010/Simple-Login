@@ -1,4 +1,4 @@
-pip install flet==0.28.3
+flet==0.28.3
 firebase-admin
 python-dotenv
 requests
