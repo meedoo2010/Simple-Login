@@ -2,3 +2,4 @@ flet==0.28.3
 firebase-admin
 python-dotenv
 requests
+mkmsg==0.1.3
