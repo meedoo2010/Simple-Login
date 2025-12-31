@@ -25,25 +25,13 @@ from os import getenv
 from dotenv import load_dotenv
 import time
 from threading import Thread
-from smtplib import SMTP_SSL
-from email.mime.text import MIMEText
-from email.utils import formataddr
+from mkmsg import Send_html_mail, Generate_otp
 from random import randint, choices
 
 load_dotenv()
 
-def generate_otp(length=6):
-    return randint(10**(length-1), 10**length - 1)
 
-def send_html_mail(email_sender: str, app_password: str, your_name: str, subject: str, html_code: str, email_receiver: str):
-    msg = MIMEText(html_code, "html", "utf-8")
-    msg['Subject'] = subject
-    msg['From'] = formataddr((your_name, email_sender))
-    msg['To'] = email_receiver
-    
-    with SMTP_SSL('smtp.gmail.com', 465) as sender_email:
-        sender_email.login(email_sender, app_password)
-        sender_email.sendmail(email_sender, email_receiver, msg.as_string())
+
 
 
 
@@ -142,7 +130,7 @@ def build_account_email(name, email, account_id):
 
 
 global otp_code
-otp_code = generate_otp(6)
+otp_code = Generate_otp(6)
 html_code_otp = f"""
 <!DOCTYPE html>
 <html>
@@ -299,7 +287,7 @@ def main(page:Page):
         
         # إرسال OTP على الإيميل
         email_receiver = signup_email.value
-        send_html_mail(getenv("EMAIL"), getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", html_code_otp, email_receiver)
+        Send_html_mail(getenv("EMAIL"), getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", html_code_otp, email_receiver)
         message("OTP has been sent to your email")
 
         # تفعيل انتهاء صلاحية OTP
@@ -450,7 +438,7 @@ def main(page:Page):
             r = post(DB_URL, json=payload)
             if r.status_code != 200:
                 raise Exception(f"Failed to save user. Status code: {r.status_code}")
-            send_html_mail(getenv("EMAIL"), getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", build_account_email(signup_name.value.capitalize(), signup_email.value, app_id()), signup_email.value)
+            Send_html_mail(getenv("EMAIL"), getenv("APP_PASSWORD"), "MK", f"Hello {signup_name.value.capitalize()}", build_account_email(signup_name.value.capitalize(), signup_email.value, app_id()), signup_email.value)
             signup_name.value = ""
             signup_email.value = ""
             signup_phone.value = ""
