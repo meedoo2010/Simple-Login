@@ -1,25 +1,4 @@
-from flet import (
-    Page,
-    Text,
-    TextField,
-    Row,
-    Image,
-    AlertDialog,
-    TextButton,
-    ElevatedButton,
-    IconButton,
-    AppBar,
-    CupertinoNavigationBar,
-    NavigationBarDestination,
-    Icons,
-    Colors,
-    ThemeMode,
-    MainAxisAlignment,
-    ImageFit,
-    KeyboardType,
-    app,
-)
-
+from flet import *
 from requests import post, get
 from os import getenv
 from dotenv import load_dotenv
@@ -208,7 +187,7 @@ def app_id():
 account_id = app_id()
 
 
-DB_URL = "https://bank-my-wallet-default-rtdb.asia-southeast1.firebasedatabase.app/login.json"
+DB_URL = "FIREBASE_LIKE"
 
 
 def main(page:Page):
