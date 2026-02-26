@@ -187,7 +187,7 @@ def app_id():
 account_id = app_id()
 
 
-DB_URL = "FIREBASE_LIKE"
+DB_URL = "FIREBASE_LINK"
 
 
 def main(page:Page):
